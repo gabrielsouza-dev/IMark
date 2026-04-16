@@ -1,4 +1,5 @@
 ﻿@inject TimeCheckService TimeCheckService
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize]
 @page "/Geral"
@@ -47,6 +48,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _timeEntries = await TimeCheckService.GetAll();
+        try
+        {
+            _timeEntries = await TimeCheckService.GetAll();
+        }
+        catch (HttpRequestException ex)
+        {
+            NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode!}", forceLoad: false);
+        }
     }
 }

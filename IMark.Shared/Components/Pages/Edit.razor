@@ -1,4 +1,5 @@
 ﻿@inject TimeCheckService TimeCheckService
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize]
 @page "/Ajustar"
@@ -79,7 +80,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _timeEntries = await TimeCheckService.GetAllEntriesNoIncludes();
+        try
+        {
+            _timeEntries = await TimeCheckService.GetAllEntriesNoIncludes();
+        }
+        catch (HttpRequestException ex)
+        {
+            NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode!}", forceLoad: false);
+        }
+
         _timeEntries.Reverse();
     }
 
@@ -92,8 +101,14 @@
             _errorMessage = "Nenhuma entrada selecionada.";
             return;
         }
-
-        _selectedTimeEntry = await TimeCheckService.GetById(_selectedTimeEntryId.Value);
+        try
+        {
+            _selectedTimeEntry = await TimeCheckService.GetById(_selectedTimeEntryId.Value);
+        }        
+        catch (HttpRequestException ex)
+        {
+            NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode!}", forceLoad: false);
+        }
     }
 
     private async Task UpdateAsync()

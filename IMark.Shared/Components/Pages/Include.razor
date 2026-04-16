@@ -1,4 +1,5 @@
 ﻿@inject TimeCheckService TimeCheckService
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize]
 @page "/Incluir"
@@ -67,7 +68,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _timeEntry = await TimeCheckService.GetTodayAsync();
+        try
+        {
+            _timeEntry = await TimeCheckService.GetTodayAsync();
+        }
+        catch (HttpRequestException ex)
+        {
+            NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode}", forceLoad: false);
+        }
+
         _timeEntry.Checks.Reverse();
     }
 

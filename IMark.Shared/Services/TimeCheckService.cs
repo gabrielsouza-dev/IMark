@@ -1,8 +1,10 @@
 ﻿using IMark.Shared.Interfaces;
 using IMark.Shared.Models.DTO.TimeTrackings;
 using IMark.Shared.Models.Requests;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -23,8 +25,7 @@ public class TimeCheckService
         var response = await _http.GetAsync("api/timecheck");
         var message = await response.Content.ReadAsStringAsync();
 
-        if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException(message, null, response.StatusCode);
+        response.EnsureSuccessStatusCode();
 
         return JsonSerializer.Deserialize<List<TimeEntryDTO>>(message, new JsonSerializerOptions
         {
@@ -37,8 +38,7 @@ public class TimeCheckService
         var response = await _http.GetAsync($"api/timecheck/{id}");
         var message = await response.Content.ReadAsStringAsync();
 
-        if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException(message, null, response.StatusCode);
+        response.EnsureSuccessStatusCode();
 
         return JsonSerializer.Deserialize<TimeEntryDTO>(message, new JsonSerializerOptions
         {
@@ -51,8 +51,7 @@ public class TimeCheckService
         var response = await _http.GetAsync("api/timecheck/all-entries-no-includes");
         var message = await response.Content.ReadAsStringAsync();
 
-        if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException(message, null, response.StatusCode);
+        response.EnsureSuccessStatusCode();
 
         return JsonSerializer.Deserialize<List<TimeEntryDTO>>(message, new JsonSerializerOptions
         {
@@ -63,23 +62,14 @@ public class TimeCheckService
     public async Task IncludeAsync(TimeCheckRequest request)
     {
         var response = await _http.PostAsJsonAsync("api/timecheck", request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException(message, null, response.StatusCode);
-        }
+        response.EnsureSuccessStatusCode();
     }
 
     public async Task<bool> UpdateTimeEntryAsync(Guid id, TimeEntryDTO dto)
     {
         var response = await _http.PutAsJsonAsync($"api/timecheck/timeentry/{dto.Id}", dto);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var message = await response.Content.ReadAsStringAsync();
-            throw new HttpRequestException(message, null, response.StatusCode);
-        }
+        response.EnsureSuccessStatusCode();
 
         return true;
     }
@@ -90,11 +80,9 @@ public class TimeCheckService
         var isoDate = localDateNow.ToString("yyyy-MM-dd");
         var response = await _http.GetAsync($"api/timecheck/get-by-day/{isoDate}");
 
-        if (!response.IsSuccessStatusCode)
-            throw new Exception($"Falha ao requisitar horários marcados. Status: {response.StatusCode}");
+        response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(content); // apagar depois de testar
 
         if (string.IsNullOrWhiteSpace(content))
             return new TimeEntryDTO();

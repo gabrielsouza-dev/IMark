@@ -1,0 +1,59 @@
+﻿@page "/error"
+@inject NavigationManager Navigation
+@inject IMark.Shared.Interfaces.ITokenStorage TokenStorage
+@inject IMark.Shared.Services.JwtAuthStateProvider AuthStateProvider
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>Erro — IManager</PageTitle>
+
+<div class="erro-wrapper">
+    <div class="erro-card">
+        <div class="erro-code">@Code</div>
+        <div class="erro-divider"></div>
+        <h1 class="erro-titulo">@Titulo</h1>
+        <p class="erro-mensagem">@Mensagem</p>
+        <div class="erro-acoes">
+            <button class="btn-voltar" @onclick="Voltar">
+                <span class="btn-icon">←</span> Voltar
+            </button>
+            <button class="btn-logout" @onclick="Logout">
+                Sair da conta
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int Code { get; set; }
+    private string Titulo { get; set; } = "Algo deu errado";
+    private string Mensagem { get; set; } = "Ocorreu um erro inesperado. Tente novamente.";
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Navigation.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("code", out var codeStr) && int.TryParse(codeStr, out var code))
+            Code = code;
+
+        (Titulo, Mensagem) = Code switch
+        {
+            401 => ("Não autorizado", "Sua sessão expirou ou você não tem permissão para acessar este recurso. Faça login novamente."),
+            403 => ("Acesso negado", "Você não tem permissão para realizar esta ação. Entre em contato com o administrador se acredita que isso é um engano."),
+            404 => ("Não encontrado", "O recurso que você tentou acessar não existe ou foi removido."),
+            408 => ("Tempo esgotado", "A requisição demorou demais para responder. Verifique sua conexão e tente novamente."),
+            500 => ("Erro interno", "Ocorreu um erro no servidor. Nossa equipe já foi notificada."),
+            503 => ("Serviço indisponível", "O serviço está temporariamente fora do ar. Tente novamente em alguns instantes."),
+            _   => ("Algo deu errado", $"Ocorreu um erro inesperado (código {Code}). Tente novamente.")
+        };
+    }
+
+    private void Voltar() => Navigation.NavigateTo("/", forceLoad: false);
+
+    private async Task Logout()
+    {
+        await AuthStateProvider.NotifyLogoutAsync();
+        Navigation.NavigateTo("/login", forceLoad: false);
+    }
+}

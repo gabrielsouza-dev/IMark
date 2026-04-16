@@ -33,11 +33,12 @@ public class AuthTokenHandler : DelegatingHandler
         else
         {
             await _jwtAuthStateProvider.NotifyLogoutAsync();
-            _navigationManager.NavigateTo("/login", forceLoad: false);
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }
 
-        return await base.SendAsync(request, ct);
+        var response = await base.SendAsync(request, ct);
+
+        return response;
     }
 
     private static bool IsTokenExpired(string token)
