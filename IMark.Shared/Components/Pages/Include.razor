@@ -3,6 +3,7 @@
 
 @attribute [Authorize]
 @page "/Incluir"
+@using TimeZoneConverter
 
 <div class="d-flex flex-column" >
 
@@ -74,7 +75,8 @@
         }
         catch (HttpRequestException ex)
         {
-            NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode}", forceLoad: false);
+            var statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : 500;
+            NavigationManager.NavigateTo($"/error?code={statusCode}", forceLoad: false);
         }
 
         _timeEntry.Checks.Reverse();
@@ -84,14 +86,21 @@
     {
         _errorMessage = string.Empty;
 
-        var request = new TimeCheckRequest(DateTime.UtcNow);
+        string timeZoneId = TimeZoneInfo.Local.Id;
+
+        if (TZConvert.TryWindowsToIana(timeZoneId, out var iana))
+        {
+            timeZoneId = iana;
+        }
+
+        var request = new TimeCheckRequest(DateTime.UtcNow, timeZoneId);
         try
         {
             _timeEntry.Checks.Insert(0, new TimeCheckDTO
             {
-                Timestamp = request.Timestamp
+                Timestamp = request.Timestamp,
+                TimeZoneId = request.TimeZoneId
             });
-
             await TimeCheckService.IncludeAsync(request);
         }
         catch (Exception ex)

@@ -11,11 +11,14 @@ namespace IMark.App
         private static string GetBaseAddress()
         {
             #if ANDROID
-                        return "https://10.0.2.2:7094";
+                if (Android.OS.Build.Brand == "google")
+                    return "https://10.0.2.2:7094"; // emulator
+
+                return "http://192.168.15.11:7094"; // device físico
             #elif IOS || MACCATALYST
-                        return "https://localhost:7094";
+                return "https://localhost:7094";
             #else
-                        return "https://localhost:7094";
+                return "https://localhost:7094";
             #endif
         }
 
