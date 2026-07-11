@@ -144,7 +144,8 @@
     {
         _selectedTimeEntry!.Checks.Add(new TimeCheckDTO
         {
-            Timestamp = _selectedTimeEntry.Date.ToDateTime(TimeOnly.FromDateTime(DateTime.UtcNow))
+            TimeZoneId = TimeZoneInfo.Local.Id,
+            TimestampLocal = _selectedTimeEntry.Date.ToDateTime(TimeOnly.FromDateTime(DateTime.Now))
         });
         StateHasChanged();
     }
