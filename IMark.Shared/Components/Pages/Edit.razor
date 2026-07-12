@@ -17,7 +17,7 @@
     {
         <!-- Selector -->
         <select class="form-select" @onchange="SelectTimeEntry">
-            <option value="@Guid.Empty" selected disabled>Escolha uma data</option>
+            <option value="@Guid.Empty" selected>Escolha uma data</option>
             @foreach (var timeEntry in _timeEntries)
             {
                 <option value="@timeEntry.Id" disabled="@(timeEntry.Status == TimeEntryStatus.Pending)">@timeEntry.Date.ToString()</option>
@@ -50,6 +50,15 @@
                         + Adicionar horário
                     </button>
                 </div>
+
+                @if (_selectedTimeEntryId is not null)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Motivo:</label>
+                        <InputTextArea class="form-control" @bind-Value="_adjutmentReason"></InputTextArea>
+                    </div>
+                }
+
                 <!-- Button -->
                 <div class="btn-wrap">
                     <button type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center" disabled="@_isLoading">
@@ -75,6 +84,7 @@
     private List<TimeEntryDTO> _timeEntries = new();
     private TimeEntryDTO? _selectedTimeEntry;
     private Guid? _selectedTimeEntryId;
+    private string _adjutmentReason = string.Empty;
     private string _errorMessage = string.Empty;
     private bool _isLoading = false;
 
@@ -98,7 +108,7 @@
 
         if (_selectedTimeEntryId == Guid.Empty)
         {
-            _errorMessage = "Nenhuma entrada selecionada.";
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
             return;
         }
         try
@@ -121,6 +131,14 @@
             return; 
         }
 
+        if(string.IsNullOrWhiteSpace(_adjutmentReason))
+        {
+            _errorMessage = "Motivo de ajuste não informado.";
+            return;
+        }
+
+        _selectedTimeEntry.AdjustmentReason = _adjutmentReason;
+
         _isLoading = true;
         StateHasChanged();
         try
@@ -136,8 +154,7 @@
         }
         finally
         {
-            _isLoading = false;
-            StateHasChanged();
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
     }
     private void AddCheck()
