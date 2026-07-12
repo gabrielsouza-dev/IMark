@@ -1,27 +1,217 @@
-/* Records table */
 .records-wrap {
     padding: 16px;
     background: #ffffff;
 }
 
-.table > :not(caption) > * > * {
-    border-bottom-color: #d0daea;
+
+
+/* =====================
+   DESKTOP TABLE
+===================== */
+
+
+.desktop-table {
+    display: block;
+}
+
+
+.table {
     color: #1e3350;
+}
+
+
+    .table > :not(caption) > * > * {
+        border-bottom-color: #d0daea;
+        font-size: 14px;
+    }
+
+
+    .table thead th {
+        color: #6a8faa;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+
+
+/* =====================
+   TIMES
+===================== */
+
+
+.times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+
+
+    .times span {
+        background: #edf4ff;
+        color: #315b92;
+        border-radius: 8px;
+        padding: 5px 9px;
+        font-size: 12px;
+    }
+
+
+
+
+/* =====================
+   MOBILE CARD
+===================== */
+
+
+.mobile-list {
+    display: none;
+}
+
+
+
+.record-card {
+    border: 1px solid #d8e2f0;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+    background: #fff;
+}
+
+
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf1f7;
+}
+
+
+
+.number {
+    font-weight: 700;
+    color: #1e3350;
+    margin-right: 12px;
+}
+
+
+
+.date {
+    color: #7890aa;
     font-size: 14px;
 }
 
-.table thead th {
-    color: #4a6e8a; 
-    font-size: 12px; 
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 600; 
-    border-bottom-color: #d0daea;
+
+
+.status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
 }
+
+
+
+.accepted {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+
+.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+
+
+
+.card-section {
+    margin-bottom: 18px;
+}
+
+
+
+.section-label {
+    color: #7890aa;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+
+
+
+
+.card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+
+    .card-info div {
+        display: flex;
+        justify-content: space-between;
+    }
+
+
+
+    .card-info span {
+        color: #7890aa;
+        font-size: 13px;
+    }
+
+
+
+    .card-info strong {
+        color: #1e3350;
+        font-size: 14px;
+    }
+
+
+
+.consistent {
+    color: #15803d !important;
+}
+
+
+
+.inconsistent {
+    color: #dc2626 !important;
+}
+
+
+
 
 .empty-msg {
     text-align: center;
-    color: #6a8faa; 
-    padding: 24px 0;
-    font-size: 15px; 
+    color: #6a8faa;
+    padding: 24px;
+}
+
+
+
+
+/* =====================
+   MOBILE BREAKPOINT
+===================== */
+
+
+@media(max-width:768px) {
+
+
+    .desktop-table {
+        display: none;
+    }
+
+
+    .mobile-list {
+        display: block;
+    }
 }

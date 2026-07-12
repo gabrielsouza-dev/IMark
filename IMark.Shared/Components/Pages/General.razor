@@ -4,47 +4,216 @@
 @attribute [Authorize]
 @page "/Geral"
 
+
 <div class="records-wrap">
-    <table class="table table-sm align-middle mb-0">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Data</th>
-                <th>Horarios</th>
-                <th>Tot. Horas</th>
-                <th>Consistencia</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="registros">
-            
-                @if (!_timeEntries.Any())
-                {
+
+    @if (!_timeEntries.Any())
+    {
+        <div class="empty-msg">
+            Nenhum ponto registrado
+        </div>
+    }
+    else
+    {
+
+        <!-- DESKTOP -->
+        <div class="desktop-table">
+
+            <table class="table table-sm align-middle">
+
+                <thead>
                     <tr>
-                        <td colspan="3" class="empty-msg">Nenhum ponto registrado</td>
+                        <th>#</th>
+                        <th>Data</th>
+                        <th>Horários</th>
+                        <th>Total</th>
+                        <th>Consistência</th>
+                        <th>Status</th>
                     </tr>
-                }
-                else
-                {
-                @foreach (var (timeEntry, index) in _timeEntries.Select((c, i) => (c, i + 1)))
+                </thead>
+
+
+                <tbody>
+
+                    @foreach (var (timeEntry, index) in _timeEntries.Select((c, i) => (c, i + 1)))
                     {
                         <tr>
+
                             <td>@index</td>
-                            <td>@timeEntry.Date.ToString()</td>
-                            <td>@string.Join(" ", timeEntry.Checks.OrderBy(c => c.TimestampLocal).Select(c => c.TimestampLocal.ToString("HH:mm:ss")).ToArray())</td>
-                            <td>@timeEntry.HoursWorked.ToString(@"hh\:mm\:ss")</td>
-                            <td>@(timeEntry.IsConsistent ? "Consistente" : "Inconsistente")</td>
-                            <td>@(timeEntry.Status == TimeEntryStatus.Accepted ? "Aceito" : "Pendente")</td>
+
+                            <td>
+                                @timeEntry.Date.ToString("dd/MM/yyyy")
+                            </td>
+
+
+                            <td>
+
+                                <div class="times">
+
+                                    @foreach (var check in timeEntry.Checks.OrderBy(c => c.TimestampLocal))
+                                    {
+                                        <span>
+                                            @check.TimestampLocal.ToString("HH:mm")
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+                                @timeEntry.HoursWorked.ToString(@"hh\:mm\:ss")
+                            </td>
+
+
+                            <td>
+                                @(timeEntry.IsConsistent ? "Consistente" : "Inconsistente")
+                            </td>
+
+
+                            <td>
+                                @(timeEntry.Status == TimeEntryStatus.Accepted
+                                    ? "Aceito"
+                                    : "Pendente")
+                            </td>
+
+
                         </tr>
                     }
-                }
-        </tbody>
-    </table>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+
+        <!-- MOBILE -->
+
+        <div class="mobile-list">
+
+
+            @foreach (var (timeEntry, index) in _timeEntries.Select((c, i) => (c, i + 1)))
+            {
+
+                <div class="record-card">
+
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <span class="number">
+                                #@index
+                            </span>
+
+                            <span class="date">
+                                @timeEntry.Date.ToString("dd/MM/yyyy")
+                            </span>
+
+                        </div>
+
+
+                        <span class="status
+                            @(timeEntry.Status == TimeEntryStatus.Accepted
+                                  ? "accepted"
+                                  : "pending")">
+
+                            @(timeEntry.Status == TimeEntryStatus.Accepted
+                                ? "Aceito"
+                                : "Pendente")
+
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div class="card-section">
+
+
+                        <div class="section-label">
+                            Horários
+                        </div>
+
+
+                        <div class="times">
+
+
+                            @foreach (var check in timeEntry.Checks.OrderBy(c => c.TimestampLocal))
+                            {
+
+                                <span>
+                                    @check.TimestampLocal.ToString("HH:mm")
+                                </span>
+
+                            }
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+                    <div class="card-info">
+
+
+                        <div>
+                            <span>Total</span>
+
+                            <strong>
+                                @timeEntry.HoursWorked.ToString(@"hh\:mm\:ss")
+                            </strong>
+                        </div>
+
+
+
+                        <div>
+
+                            <span>Consistência</span>
+
+
+                            <strong class="
+                                @(timeEntry.IsConsistent
+                                        ? "consistent"
+                                        : "inconsistent")">
+
+                                @(timeEntry.IsConsistent
+                                    ? "Consistente"
+                                    : "Inconsistente")
+
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+            }
+
+
+        </div>
+
+    }
+
 </div>
 
-@code{
+
+
+@code {
+
     private List<TimeEntryDTO> _timeEntries = new();
     private string _errorMessage = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,4 +226,5 @@
             NavigationManager.NavigateTo($"/error?code={(int)ex.StatusCode!}", forceLoad: false);
         }
     }
+
 }
